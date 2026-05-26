@@ -74,6 +74,13 @@ This will save your API key to `~/.workfm/config.json`
 
 ## Usage
 
+
+### Show all available stations
+
+```bash
+workfm show stations
+```
+
 ### Play a station
 
 ```bash
