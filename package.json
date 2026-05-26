@@ -1,16 +1,20 @@
 {
-  "name": "radio",
-  "version": "1.0.0",
+  "name": "workfm",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
-    "debug": "node --inspect-brk=9229 --import tsx src/cli.ts"
+    "debug": "node --inspect-brk=9229 --import tsx src/cli.ts",
+    "prepublishOnly": "npm run build"
   },
+  "files": [
+    "dist"
+  ],
   "bin": {
-    "radio": "./dist/cli.js"
+    "workfm": "./dist/cli.js"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +22,6 @@
   "type": "commonjs",
   "dependencies": {
     "chalk": "^5.6.2",
-    "commander": "^14.0.3",
     "sade": "^1.8.1"
   },
   "devDependencies": {

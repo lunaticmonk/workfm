@@ -1,6 +1,5 @@
 import { Readable } from "node:stream";
 
-
 export async function load(track: string) {
     const audioResponse = await fetch(track);
     if (!audioResponse.body) {

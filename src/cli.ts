@@ -1,44 +1,44 @@
 #!/usr/bin/env node
-import os from 'os';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 import chalk from 'chalk';
 import sade from 'sade';
 
+import { collateTracks, Station, STATIONS } from "./collateTracks";
 import { load } from './loadStream';
 import { play } from './playStream';
-import { collateTracks, Station, STATIONS } from "./collateTracks";
 
 // Define the CLI
-const prog = sade('terminal-radio');
+const prog = sade('workfm');
 prog
     .command('config set <JAMENDO_CLIENT_ID>')
     .describe('Sets the Jamendo Client ID in the global configs (to be run only once)')
     .action((JAMENDO_CLIENT_ID: string) => {
-        const configPath = path.resolve(os.homedir(), ".terminal-radio", 'config.json');
+        const configPath = path.resolve(os.homedir(), ".workfm", 'config.json');
 
         if (!fs.existsSync(configPath)) {
             fs.mkdirSync(path.dirname(configPath), { recursive: true });
+        } else {
+            console.log(chalk.bold("CONFIG SEEMS TO BE ALREADY PRESENT, OVERWRITING IT."));
         }
 
         fs.writeFileSync(configPath, JSON.stringify({ JAMENDO_CLIENT_ID: JAMENDO_CLIENT_ID }));
-        console.log("API KEY IS SET!");
         console.log(chalk.bold("WOOHOO. API KEY IS SET!"));
     });
 prog
-    .command('radio [station]')
-    .describe('Play a radio station of your choice')
+    .command('play [station]', 'Play a radio station of your choice', { default: true })
     .option('-s, --search', 'Search for any music based on the keywords')
-    .example('radio cafe')
-    .example('radio -s "jazz music"')
+    .example('workfm cafe')
+    .example('workfm -s "jazz music"')
     .action(async (station: string | undefined, opts: { search?: string }) => {
         assertApiKey();
         try {
             await handlePlay(station, opts?.search);
             console.log(chalk.white.bold.bgGreen("DONE PLAYING THE TRACKS, RESTART TO PLAY MORE"));
-        } catch (_error) {
-            console.log(chalk.red("CALL THE AMBULANCE, ERROR PLAYING THE TRACKS"));
+        } catch (err) {
+            console.log(chalk.red("CALL THE AMBULANCE: ", err instanceof Error ? err.message : "UNKNOWN ERROR"));
         }
     });
 prog.parse(process.argv);
@@ -47,7 +47,7 @@ async function handlePlay(stationArg: string | undefined, search: string | undef
     const station = stationArg && stationArg in STATIONS ? (stationArg as Station) : "lofi";
     const allTracks = await collateTracks(station, search);
 
-    console.log(chalk.white.bold.bgBlue("RADIO PLAYLIST "));
+    console.log(chalk.white.bold.bgBlue("WORKFM PLAYLIST "));
     console.log(chalk.cyan(`Station:`), chalk.bold(station));
     console.log(chalk.gray("----------------------------------------"));
 
@@ -67,17 +67,17 @@ async function handlePlay(stationArg: string | undefined, search: string | undef
 }
 
 function assertApiKey() {
-    const configPath = path.join(os.homedir(), ".terminal-radio", "config.json");
+    const configPath = path.join(os.homedir(), ".workfm", "config.json");
     try {
         const config = fs.readFileSync(configPath, "utf-8");
         const parsed = JSON.parse(config);
         if (!parsed?.JAMENDO_CLIENT_ID) {
-            throw new Error("API KEY NOT SET PROPERLY. PLEASE CHECK THE CONFIG IN ~/.terminal-radio/config.json");
+            throw new Error("API KEY NOT SET PROPERLY. PLEASE CHECK THE CONFIG IN ~/.workfm/config.json");
         }
     } catch (error) {
         const err = error as NodeJS.ErrnoException | undefined;
         if (err?.code === "ENOENT") {
-            console.log(chalk.red("CONFIG NOT FOUND. PLEASE SET YOUR JAMENDO API KEY USING `terminal-radio config set <JAMENDO_CLIENT_ID>`"));
+            console.log(chalk.red("CONFIG NOT FOUND. PLEASE SET YOUR JAMENDO API KEY USING `workfm config set <JAMENDO_CLIENT_ID>`"));
             process.exit(1);
         }
         throw error;

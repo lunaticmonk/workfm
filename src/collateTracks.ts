@@ -1,7 +1,8 @@
-import chalk from 'chalk';
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import fs from 'node:fs';
+
+import chalk from 'chalk';
 
 export const STATIONS = {
     lofi: "lofi study chill",
@@ -11,13 +12,12 @@ export const STATIONS = {
 };
 
 export async function collateTracks(station: Station, override: string | undefined) {
-    const FETCH_TRACKS_REQUEST_URL = `https://api.jamendo.com/v3.0/tracks/?client_id=${getClientId()}&search=${encodeURIComponent(override || STATIONS[station])}&durationbetween=0_40&format=json&limit=10`;
+    const FETCH_TRACKS_REQUEST_URL = `https://api.jamendo.com/v3.0/tracks/?client_id=${getClientId()}&search=${encodeURIComponent(override || STATIONS[station])}&durationbetween=0_300&format=json&limit=20`;
     const response = await fetch(FETCH_TRACKS_REQUEST_URL);
     const data: FetchTracksResp = await response.json();
 
-    if (!data) {
-        console.log(chalk.red("No tracks available for the requested genre"));
-        throw new Error("No tracks available for the requested genre");
+    if (data.headers.status === "failed") {
+        throw new Error("Error fetching the tracks from Jamendo API. Please check your API key set in config and try again.");
     }
 
     const tracks = data.results.map(r => ({
@@ -36,14 +36,14 @@ function getClientId() {
         return process.env.JAMENDO_CLIENT_ID;
     }
 
-    const configPath = path.join(os.homedir(), ".terminal-radio", "config.json");
+    const configPath = path.join(os.homedir(), ".workfm", "config.json");
 
     try {
         const config = fs.readFileSync(configPath, "utf-8");
         const parsed = JSON.parse(config);
         return parsed.JAMENDO_CLIENT_ID;
     } catch (error) {
-        console.log(chalk.red("API KEY NOT SET. PLEASE SET IT USING THE `terminal-radio config set <JAMENDO_CLIENT_ID>` COMMAND"));
+        console.log(chalk.red("API KEY NOT SET. PLEASE SET IT USING THE `workfm config set <JAMENDO_CLIENT_ID>` COMMAND"));
         throw error;
     }
 }
@@ -69,5 +69,8 @@ type Track = {
 }
 
 type FetchTracksResp = {
+    headers: {
+        status: "success" | "failed";
+    };
     results: Array<Track>
 };
