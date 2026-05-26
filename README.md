@@ -49,6 +49,19 @@ WorkFM uses the [Jamendo API](https://developer.jamendo.com/) to fetch royalty-f
 
 ![Jamendo Client ID screenshot](./assets/workfm-jamendo-client-id.png)
 
+
+### Install via npm / use directly via npx
+
+```bash
+npm install -g workfm
+```
+
+You can also use `npx` if you would like to avoid a permanent installation.
+
+```bash
+npx workfm <command>
+```
+
 ### Configure Your API Key
 
 Run the following command with your Jamendo Client ID:
