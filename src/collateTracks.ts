@@ -1,4 +1,7 @@
 import chalk from 'chalk';
+import os from 'node:os';
+import path from 'node:path';
+import fs from 'node:fs';
 
 export const STATIONS = {
     lofi: "lofi study chill",
@@ -7,9 +10,8 @@ export const STATIONS = {
     focus: "focus instrumental",
 };
 
-export async function collateTracks(station: Station) {
-    const FETCH_TRACKS_REQUEST_URL = `https://api.jamendo.com/v3.0/tracks/?client_id=${process.env.JAMENDO_API_KEY}&search=${encodeURIComponent(STATIONS[station])}&durationbetween=0_40&format=json&limit=10`;
-
+export async function collateTracks(station: Station, override: string | undefined) {
+    const FETCH_TRACKS_REQUEST_URL = `https://api.jamendo.com/v3.0/tracks/?client_id=${getClientId()}&search=${encodeURIComponent(override || STATIONS[station])}&durationbetween=0_40&format=json&limit=10`;
     const response = await fetch(FETCH_TRACKS_REQUEST_URL);
     const data: FetchTracksResp = await response.json();
 
@@ -26,6 +28,24 @@ export async function collateTracks(station: Station) {
     }));
 
     return shuffled<Track>(tracks);
+}
+
+
+function getClientId() {
+    if (process.env.JAMENDO_CLIENT_ID) {
+        return process.env.JAMENDO_CLIENT_ID;
+    }
+
+    const configPath = path.join(os.homedir(), ".terminal-radio", "config.json");
+
+    try {
+        const config = fs.readFileSync(configPath, "utf-8");
+        const parsed = JSON.parse(config);
+        return parsed.JAMENDO_CLIENT_ID;
+    } catch (error) {
+        console.log(chalk.red("API KEY NOT SET. PLEASE SET IT USING THE `terminal-radio config set <JAMENDO_CLIENT_ID>` COMMAND"));
+        throw error;
+    }
 }
 
 function shuffled<T>(array: T[]) {

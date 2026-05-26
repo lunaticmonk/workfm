@@ -19,7 +19,7 @@
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.3",
-    "dotenv": "^17.4.2"
+    "sade": "^1.8.1"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
