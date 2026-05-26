@@ -41,6 +41,14 @@ prog
             console.log(chalk.red("CALL THE AMBULANCE: ", err instanceof Error ? err.message : "UNKNOWN ERROR"));
         }
     });
+prog
+    .command('show stations', 'Show available radio stations', { default: true })
+    .action(() => {
+        console.log(chalk.white.bold.bgBlue("AVAILABLE STATIONS:"));
+        Object.keys(STATIONS).forEach((key) => {
+            console.log(`- ${chalk.bold(key)}`);
+        });
+    });
 prog.parse(process.argv);
 
 async function handlePlay(stationArg: string | undefined, search: string | undefined) {
