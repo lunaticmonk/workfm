@@ -54,7 +54,7 @@ prog.parse(process.argv);
 
 async function handlePlay(stationArg: string | undefined, search: string | undefined) {
     const isStationValid = stationArg && STATIONS.includes(stationArg);
-    if (!isStationValid) {
+    if (!isStationValid && !search) {
         console.log(chalk.yellow(`Provided station ${stationArg} not found, playing the fallback default station: ${DEFAULT_STATION}`));
     }
 
