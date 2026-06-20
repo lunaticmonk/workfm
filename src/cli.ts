@@ -59,10 +59,15 @@ async function handlePlay(stationArg: string | undefined, search: string | undef
     console.log(chalk.cyan(`Station:`), chalk.bold(station));
     console.log(chalk.gray("----------------------------------------"));
 
-    for (const track of allTracks) {
+    for (let i = 0; i < allTracks.length; i++) {
+        const track = allTracks[i];
+        const next = allTracks[i + 1];
         const trackInfo = `Track: ${chalk.bold(track.name)}\nArtist: ${chalk.bold(track.artist_name)}\nAlbum: ${chalk.bold(track.album_name)}`;
         console.log(chalk.green.bold("NOW PLAYING"));
         console.log(trackInfo);
+        if (next) {
+            console.log(chalk.gray(`Up next: ${chalk.bold(next.name)} — ${next.artist_name}`));
+        }
         console.log(chalk.gray("----------------------------------------"));
 
         try {
