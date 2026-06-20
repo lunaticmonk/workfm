@@ -6,7 +6,7 @@ import path from 'node:path';
 import chalk from 'chalk';
 import sade from 'sade';
 
-import { collateTracks, Station, STATIONS } from "./collateTracks";
+import { collateTracks, DEFAULT_STATION, STATIONS } from "./collateTracks";
 import { load } from './loadStream';
 import { play } from './playStream';
 
@@ -45,14 +45,19 @@ prog
     .command('show stations', 'Show available radio stations', { default: true })
     .action(() => {
         console.log(chalk.white.bold.bgBlue("AVAILABLE STATIONS:"));
-        Object.keys(STATIONS).forEach((key) => {
+        STATIONS.forEach((key) => {
             console.log(`- ${chalk.bold(key)}`);
         });
     });
 prog.parse(process.argv);
 
 async function handlePlay(stationArg: string | undefined, search: string | undefined) {
-    const station = stationArg && stationArg in STATIONS ? (stationArg as Station) : "lofi";
+    const isStationValid = stationArg && STATIONS.includes(stationArg);
+    if (!isStationValid) {
+        console.log(chalk.yellow(`Provided station ${stationArg} not found, playing the fallback default station: ${DEFAULT_STATION}`));
+    }
+
+    const station = !isStationValid ? DEFAULT_STATION : stationArg;
     const allTracks = await collateTracks(station, search);
 
     console.log(chalk.white.bold.bgBlue("WORKFM PLAYLIST "));

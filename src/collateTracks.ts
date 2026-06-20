@@ -4,15 +4,16 @@ import path from 'node:path';
 
 import chalk from 'chalk';
 
-export const STATIONS = {
-    lofi: "lofi study chill",
-    cafe: "coffee jazz cafe",
-    rain: "ambient rain calm",
-    focus: "focus instrumental",
-};
+export const DEFAULT_STATION = "lofi";
+export const STATIONS = [DEFAULT_STATION, "cafe", "rain", "focus", "jazz"];
 
-export async function collateTracks(station: Station, override: string | undefined) {
-    const FETCH_TRACKS_REQUEST_URL = `https://api.jamendo.com/v3.0/tracks/?client_id=${getClientId()}&search=${encodeURIComponent(override || STATIONS[station])}&durationbetween=0_300&format=json&limit=20`;
+export async function collateTracks(station: String, searchKeywords: string | undefined) {
+    const clientId = getClientId();
+    const base = `https://api.jamendo.com/v3.0/tracks/?client_id=${clientId}&durationbetween=0_300&format=json&limit=20`;
+    const lookup = searchKeywords
+        ? `search=${encodeURIComponent(searchKeywords)}`
+        : `tags=${station}&order=popularity_month`;
+    const FETCH_TRACKS_REQUEST_URL = `${base}&${lookup}`;
     const response = await fetch(FETCH_TRACKS_REQUEST_URL);
     const data: FetchTracksResp = await response.json();
 
@@ -58,8 +59,6 @@ function shuffled<T>(array: T[]) {
 
     return copy;
 }
-
-export type Station = keyof typeof STATIONS;
 
 type Track = {
     album_name: string,
