@@ -6,7 +6,8 @@ import path from 'node:path';
 import chalk from 'chalk';
 import sade from 'sade';
 
-import { collateTracks, DEFAULT_STATION, STATIONS } from "./collateTracks";
+import { collateTracks } from "./collateTracks";
+import { STATIONS, DEFAULT_STATION } from './constants';
 import { load } from './loadStream';
 import { play } from './playStream';
 

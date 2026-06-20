@@ -4,9 +4,6 @@ import path from 'node:path';
 
 import chalk from 'chalk';
 
-export const DEFAULT_STATION = "lofi";
-export const STATIONS = [DEFAULT_STATION, "cafe", "rain", "focus", "jazz"];
-
 export async function collateTracks(station: String, searchKeywords: string | undefined) {
     const clientId = getClientId();
     const base = `https://api.jamendo.com/v3.0/tracks/?client_id=${clientId}&durationbetween=0_300&format=json&limit=20`;
